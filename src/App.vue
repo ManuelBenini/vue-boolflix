@@ -1,26 +1,23 @@
 <template>
   <div>
-
-    <HeaderComp />
     <MainComp />
-
   </div>
 </template>
 
 <script>
-import HeaderComp from './components/HeaderComp.vue';
-import MainComp from './components/MainComp.vue';
+  import MainComp from './components/MainComp.vue';
 
 
-export default {
-  name: 'App',
-  components: {
-    HeaderComp,
-    MainComp
-}
-}
+  export default {
+    name: 'App',
+    components: {
+      MainComp
+    }
+  }
 </script>
 
 <style lang="scss">
+  @import './assets/style/variables.scss';
+  @import './assets/style/generals.scss';
 
 </style>
