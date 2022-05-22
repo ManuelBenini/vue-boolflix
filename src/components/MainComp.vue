@@ -8,13 +8,10 @@
 
       <div class="cards">
         <CardComp 
-          :key="film.id" 
           v-for="film in films" 
-          :filmImage="`${filmPoster}${film.poster_path}`" 
-          :FilmLanguage="film.original_language" 
-          :filmOriginalTitle="film.original_title" 
-          :filmTranslatedTitle="film.title" 
-          :FilmValutation="film.vote_average" 
+          :key="film.id" 
+          :film="film"
+          :filmImageUrl="filmImageUrl"
         />
       </div>
 
@@ -41,7 +38,7 @@
           query: 'harry potter'
         },
         films: [],
-        filmPoster: 'https://image.tmdb.org/t/p/w500'
+        filmImageUrl: 'https://image.tmdb.org/t/p/w500'
       }
     },
     methods:{
@@ -73,7 +70,11 @@
       },
       queryString(string){
         this.apiParams.query = string;
-        this.getApi();
+        if(this.apiParams.query === ''){
+          this.getTrendingFilms()
+        } else{
+          this.getApi()
+        }  
       }
     },
 
@@ -91,12 +92,14 @@
     background-color: $primary-color;
     min-height: 100vh;
     .container{
+      padding-top: 5px;
       display: flex;
       flex-direction: column;
       width: 70%;
       margin: 0 auto;
       h1{
-        color: grey;
+        color: white;
+        margin-bottom: 10px;
       }
       .cards{
         display: flex;

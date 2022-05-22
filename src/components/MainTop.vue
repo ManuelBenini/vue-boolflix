@@ -8,7 +8,7 @@
     <div class="inputs">
       <input placeholder="Cerca film o serie TV" type="text" v-model="queryByUser" @keyup.enter="$emit('userQuery', queryByUser)">
       <button @click="$emit('userQuery', queryByUser)">Cerca</button>
-      <button @click="queryByUser = '' ">Reset</button>
+      <button @click="queryByUser = '', $emit('userQuery', queryByUser) ">Reset</button>
       <select name="" id="">
         <option value="all">All</option>
         <option value="film">Film</option>
@@ -40,7 +40,7 @@ export default {
     padding: 10px 10px;
     background-image: linear-gradient(black, $primary-color);
     img{
-      width: 75%;
+      width: 150px;
       height: 100%;
     }
     .inputs{
@@ -48,10 +48,19 @@ export default {
       align-items: center;
       & *{
         margin: 0 5px;
+        background-color: transparent;
+        color: white;
+        border: 1px solid white;
+        cursor: pointer;
       }
       input{
         width: 300px;
         height: 80%;
+        border: 1px solid white;
+        padding-left: 30px;
+        &::placeholder{
+          color: grey;
+        }
       }
       button{
         width: 60px;
@@ -59,6 +68,9 @@ export default {
       }
       select{
         height: 80%;
+        option{
+          background: black;
+        }
       }
     }
   }
