@@ -38,7 +38,8 @@
           <div class="star star-5" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
         </div>
         <div class="description">
-          <p>{{queryElement.overview}}</p>
+          <p v-if="queryElement.overview != ''">{{queryElement.overview}}</p>
+          <p v-else>Nessuna descrizione.</p>
         </div>
       </div>
 
@@ -72,7 +73,8 @@
           <div class="star star-5" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
         </div>
         <div class="description">
-          <p>{{queryElement.overview}}</p>
+          <p v-if="queryElement.overview != ''">{{queryElement.overview}}</p>
+          <p v-else>Nessuna descrizione.</p>
         </div>
       </div>
 
