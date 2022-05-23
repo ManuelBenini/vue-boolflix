@@ -11,11 +11,13 @@
       <div class="flip-card-back" v-if="typeOfSearch === 'film'">
         <h2>{{queryElement.title}}</h2>
         <p v-if="queryElement.original_title != queryElement.title">titolo originale: {{queryElement.original_title}}</p>
-        <p v-if="queryElement.original_language != '' " class="flag">
+        <p 
+          v-if="queryElement.original_language != 'sv' && queryElement.original_language != 'sk' && queryElement.original_language != 'nl'" 
+          class="flag">
           <lang-flag :iso="queryElement.original_language" 
           :squared="false" />
         </p>
-        <p v-else>La lingua non è disponibile</p>
+        <p v-else>Lingua: {{queryElement.original_language}}</p>
         <p>Voto: {{queryElement.vote_average / 2}}</p>
         <div class="stars">
           <div class="star star-1" v-if="queryElement.vote_average / 2 > 1" ><font-awesome-icon icon="fa-solid fa-star" /></div>
@@ -46,11 +48,13 @@
       <div class="flip-card-back" v-if="typeOfSearch === 'serieTV'">
         <h2>{{queryElement.name}}</h2>
         <p v-if="queryElement.original_name != queryElement.name">titolo originale: {{queryElement.original_name}}</p>
-        <p v-if="queryElement.original_language != '' " class="flag">
+        <p 
+          v-if="queryElement.original_language != 'sv' && queryElement.original_language != 'sk' && queryElement.original_language != 'nl'" 
+          class="flag">
           <lang-flag :iso="queryElement.original_language" 
           :squared="false" />
         </p>
-        <p v-else>La lingua non è disponibile</p>
+        <p v-else>Lingua: {{queryElement.original_language}}</p>
         <p>Voto: {{queryElement.vote_average / 2}}</p>
         <div class="stars">
           <div class="star star-1" v-if="queryElement.vote_average / 2 > 1" ><font-awesome-icon icon="fa-solid fa-star" /></div>
