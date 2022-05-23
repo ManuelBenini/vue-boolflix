@@ -1,15 +1,15 @@
 <template>
   <header>
 
-    <div class="logo">
+    <div class="logo" @click="queryByUser = '', $emit('userQuery', queryByUser)">
       <img src="../assets/img/logo.png" alt="">
     </div>
 
     <div class="inputs">
       <input placeholder="Cerca film o serie TV" type="text" v-model="queryByUser" @keyup.enter="$emit('userQuery', queryByUser)">
       <button @click="$emit('userQuery', queryByUser)">Cerca</button>
-      <button @click="queryByUser = '', $emit('userQuery', queryByUser) ">Reset</button>
-      <select name="" id="">
+      <button @click="queryByUser = '', $emit('userQuery', queryByUser)">Reset</button>
+      <select name="" id="" v-model="selectedOption" @change="$emit('optionChanger', selectedOption)" >
         <option value="all">All</option>
         <option value="film">Film</option>
         <option value="serieTV">Serie TV</option>
@@ -23,7 +23,8 @@ export default {
   name: 'MainTop',
   data(){
     return{
-      queryByUser: ''
+      queryByUser: '',
+      selectedOption: 'all'
     }
   }
 }
@@ -39,9 +40,12 @@ export default {
     background-color: brown;
     padding: 10px 10px;
     background-image: linear-gradient(black, $primary-color);
-    img{
-      width: 150px;
-      height: 100%;
+    .logo{
+      cursor: pointer;
+      img{
+        width: 150px;
+        height: 100%;
+      }
     }
     .inputs{
       display: flex;

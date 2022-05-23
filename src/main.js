@@ -18,6 +18,13 @@ library.add(faStar, faStarHalfStroke, fasStar)
 /* add font awesome icon component */
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
+
+// import flag component
+import LangFlag from 'vue-lang-code-flags';
+
+Vue.component('lang-flag', LangFlag);
+
+
 Vue.config.productionTip = false
 
 new Vue({
