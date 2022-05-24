@@ -1,62 +1,66 @@
 <template>
   <main>
-
-    <MainTop 
-      @userQuery="queryString" 
-      @itemChanger="itemSelector"
-      @movieGenreChanger="movieGenreSelector"
-      @tvGenreChanger="tvGenreSelector"
-      :movieGenres="movieGenres"
-      :tvGenres="tvGenres"
-    />
+    <div v-if="isLoaded">
+      <MainTop 
+        @userQuery="queryString" 
+        @itemChanger="itemSelector"
+        @movieGenreChanger="movieGenreSelector"
+        @tvGenreChanger="tvGenreSelector"
+        :movieGenres="movieGenres"
+        :tvGenres="tvGenres"
+      />
     
-    <div class="container" v-if="isLoaded">
+      <div class="container">
 
-      <QueryTitleComp title="Film" v-if="selectedItem === 'all' || selectedItem === 'film'" />
+        <QueryTitleComp title="Film" v-if="selectedItem === 'all' || selectedItem === 'film'" />
 
-      <div class="film-cards" v-if="films.length > 0 && (selectedItem === 'all' || selectedItem === 'film')" >
-        <CardComp 
-          v-for="film in movieWithGenre" 
-          :key="film.id" 
-          :queryElement="film"
-          :elementImageUrl="ImageUrl"
-          typeOfSearch="film"
-          :apiUrlBase="apiUrlBase"
-          :api_key="apiParams.api_key"
-          :language="apiParams.language"
-        />
+        <div class="film-cards" v-if="films.length > 0 && (selectedItem === 'all' || selectedItem === 'film')" >
+          <CardComp 
+            v-for="film in movieWithGenre" 
+            :key="film.id" 
+            :queryElement="film"
+            :elementImageUrl="ImageUrl"
+            typeOfSearch="film"
+            :apiUrlBase="apiUrlBase"
+            :api_key="apiParams.api_key"
+            :language="apiParams.language"
+          />
+        </div>
+
+        <div v-if="(films.length === 0 || movieWithGenre.length === 0) && (selectedItem === 'all' || selectedItem === 'film')">
+          <h2>Non è stato trovato nessun film</h2>
+        </div>
+
+        <QueryTitleComp title="Serie TV" v-if="selectedItem === 'all' || selectedItem === 'serieTV'" />
+
+        <div class="tvSeries-cards" v-if="tvSeries.length > 0 && (selectedItem === 'all' || selectedItem === 'serieTV')">
+          <CardComp 
+            v-for="serie in tvWithGenre" 
+            :key="serie.id" 
+            :queryElement="serie"
+            :elementImageUrl="ImageUrl"
+            typeOfSearch="serieTV"
+            :apiUrlBase="apiUrlBase"
+            :api_key="apiParams.api_key"
+            :language="apiParams.language"
+          />
+        </div>
+
+        <div v-if="(tvSeries.length === 0 || tvWithGenre.length === 0) && (selectedItem === 'all' || selectedItem === 'serieTV')">
+          <h2>Non è stata trovata nessuna serie TV</h2>
+        </div>
+
       </div>
-
-      <div v-if="(films.length === 0 || movieWithGenre.length === 0) && (selectedItem === 'all' || selectedItem === 'film')">
-        <h2>Non è stato trovato nessun film</h2>
-      </div>
-
-      <QueryTitleComp title="Serie TV" v-if="selectedItem === 'all' || selectedItem === 'serieTV'" />
-
-      <div class="tvSeries-cards" v-if="tvSeries.length > 0 && (selectedItem === 'all' || selectedItem === 'serieTV')">
-        <CardComp 
-          v-for="serie in tvWithGenre" 
-          :key="serie.id" 
-          :queryElement="serie"
-          :elementImageUrl="ImageUrl"
-          typeOfSearch="serieTV"
-          :apiUrlBase="apiUrlBase"
-          :api_key="apiParams.api_key"
-          :language="apiParams.language"
-        />
-      </div>
-
-      <div v-if="(tvSeries.length === 0 || tvWithGenre.length === 0) && (selectedItem === 'all' || selectedItem === 'serieTV')">
-        <h2>Non è stata trovata nessuna serie TV</h2>
-      </div>
-
     </div>
 
     <div v-else class="loading">
+      <img src="../assets/img/logo.png" alt="">
       <h1>{{referenceSelector(0, filmReference.default.length)}}</h1>
-      <div class="lds-heart">
-        <div>
-        </div>
+      <div class="lds-ring">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
       </div>
     </div>
 
@@ -238,64 +242,57 @@
       }
     }
     .loading{
-      color: white;
-      text-align: center;
-      margin-top: 50px;
+      color: red;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: black;
+      padding: 10px;
+      & *{
+        margin-bottom: 10px;
+      }
+      img{
+        margin-bottom: 60px;
+        width: 500px;
+      }
     }
 
     // loading
-    .lds-heart {
+    .lds-ring {
       display: inline-block;
       position: relative;
       width: 80px;
       height: 80px;
-      transform: rotate(45deg);
-      transform-origin: 40px 40px;
     }
-    .lds-heart div {
-      top: 32px;
-      left: 32px;
-      position: absolute;
-      width: 32px;
-      height: 32px;
-      background: #fff;
-      animation: lds-heart 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
-    }
-    .lds-heart div:after,
-    .lds-heart div:before {
-      content: " ";
-      position: absolute;
+    .lds-ring div {
+      box-sizing: border-box;
       display: block;
-      width: 32px;
-      height: 32px;
-      background: #fff;
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      margin: 8px;
+      border: 8px solid red;
+      border-radius: 50%;
+      animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+      border-color: red transparent transparent transparent;
     }
-    .lds-heart div:before {
-      left: -24px;
-      border-radius: 50% 0 0 50%;
+    .lds-ring div:nth-child(1) {
+      animation-delay: -0.45s;
     }
-    .lds-heart div:after {
-      top: -24px;
-      border-radius: 50% 50% 0 0;
+    .lds-ring div:nth-child(2) {
+      animation-delay: -0.3s;
     }
-    @keyframes lds-heart {
+    .lds-ring div:nth-child(3) {
+      animation-delay: -0.15s;
+    }
+    @keyframes lds-ring {
       0% {
-        transform: scale(0.95);
-      }
-      5% {
-        transform: scale(1.1);
-      }
-      39% {
-        transform: scale(0.85);
-      }
-      45% {
-        transform: scale(1);
-      }
-      60% {
-        transform: scale(0.95);
+        transform: rotate(0deg);
       }
       100% {
-        transform: scale(0.9);
+        transform: rotate(360deg);
       }
     }
   }
