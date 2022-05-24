@@ -1,18 +1,41 @@
 <template>
   <header>
 
-    <div class="logo" @click="queryByUser = '', $emit('userQuery', queryByUser)">
+    <div 
+      class="logo" 
+      @click="queryByUser = '', 
+      selectedGenreMovie = 'all', 
+      selectedGenreTV = 'all', 
+      $emit('userQuery', queryByUser)"
+    >
       <img src="../assets/img/logo.png" alt="">
     </div>
 
     <div class="inputs">
       <input placeholder="Cerca film o serie TV" type="text" v-model="queryByUser" @keyup.enter="$emit('userQuery', queryByUser)">
+
       <button @click="$emit('userQuery', queryByUser)">Cerca</button>
-      <button @click="queryByUser = '', $emit('userQuery', queryByUser)">Reset</button>
-      <select name="" id="" v-model="selectedOption" @change="$emit('optionChanger', selectedOption)" >
-        <option value="all">All</option>
+      <button 
+        @click="queryByUser = '', 
+        selectedGenreMovie = 'all', 
+        selectedGenreTV = 'all',  
+        $emit('userQuery', queryByUser)"
+      >Reset</button>
+
+      <select v-model="selectedItem" @change="$emit('itemChanger', selectedItem)" >
+        <option value="all">Film e serieTV</option>
         <option value="film">Film</option>
         <option value="serieTV">Serie TV</option>
+      </select>
+
+      <select v-model="selectedGenreMovie" @change="$emit('movieGenreChanger', selectedGenreMovie)" >
+        <option value="all">(film) Tutti i generi</option>
+        <option v-for="genre in movieGenres" :key="genre.id" :value="genre.name">{{genre.name}}</option>
+      </select>
+
+      <select v-model="selectedGenreTV" @change="$emit('tvGenreChanger', selectedGenreTV)" >
+        <option value="all">(serieTV) Tutti i generi</option>
+        <option v-for="genre in tvGenres" :key="genre.id" :value="genre.name">{{genre.name}}</option>
       </select>
     </div>
   </header>
@@ -21,10 +44,16 @@
 <script>
 export default {
   name: 'MainTop',
+  props:{
+    movieGenres: Array,
+    tvGenres: Array
+  },
   data(){
     return{
       queryByUser: '',
-      selectedOption: 'all'
+      selectedItem: 'all',
+      selectedGenreMovie: 'all',
+      selectedGenreTV: 'all'
     }
   }
 }

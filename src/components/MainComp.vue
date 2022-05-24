@@ -1,15 +1,22 @@
 <template>
   <main>
 
-    <MainTop @userQuery="queryString" @optionChanger="optionSelector" />
+    <MainTop 
+      @userQuery="queryString" 
+      @itemChanger="itemSelector"
+      @movieGenreChanger="movieGenreSelector"
+      @tvGenreChanger="tvGenreSelector"
+      :movieGenres="movieGenres"
+      :tvGenres="tvGenres"
+    />
     
     <div class="container" v-if="isLoaded">
 
-      <QueryTitleComp title="Film" v-if="selectedOption === 'all' || selectedOption === 'film'" />
+      <QueryTitleComp title="Film" v-if="selectedItem === 'all' || selectedItem === 'film'" />
 
-      <div class="film-cards" v-if="films.length > 0 && selectedOption === 'all' || selectedOption === 'film'" >
+      <div class="film-cards" v-if="films.length > 0 && (selectedItem === 'all' || selectedItem === 'film')" >
         <CardComp 
-          v-for="film in films" 
+          v-for="film in movieWithGenre" 
           :key="film.id" 
           :queryElement="film"
           :elementImageUrl="ImageUrl"
@@ -20,15 +27,15 @@
         />
       </div>
 
-      <div v-if="films.length === 0 && (selectedOption === 'all' || selectedOption === 'film')">
+      <div v-if="(films.length === 0 || movieWithGenre.length === 0) && (selectedItem === 'all' || selectedItem === 'film')">
         <h2>Non è stato trovato nessun film</h2>
       </div>
 
-      <QueryTitleComp title="Serie TV" v-if="selectedOption === 'all' || selectedOption === 'serieTV'" />
+      <QueryTitleComp title="Serie TV" v-if="selectedItem === 'all' || selectedItem === 'serieTV'" />
 
-      <div class="tvSeries-cards" v-if="tvSeries.length > 0 && selectedOption === 'all' || selectedOption === 'serieTV'">
+      <div class="tvSeries-cards" v-if="tvSeries.length > 0 && (selectedItem === 'all' || selectedItem === 'serieTV')">
         <CardComp 
-          v-for="serie in tvSeries" 
+          v-for="serie in tvWithGenre" 
           :key="serie.id" 
           :queryElement="serie"
           :elementImageUrl="ImageUrl"
@@ -39,8 +46,8 @@
         />
       </div>
 
-      <div v-if="tvSeries.length === 0 && (selectedOption === 'all' || selectedOption === 'serieTV')">
-        <h2>Non è stato trovata nessuna serie TV</h2>
+      <div v-if="(tvSeries.length === 0 || tvWithGenre.length === 0) && (selectedItem === 'all' || selectedItem === 'serieTV')">
+        <h2>Non è stata trovata nessuna serie TV</h2>
       </div>
 
     </div>
@@ -77,9 +84,12 @@
         },
         films: [],
         tvSeries: [],
-        actors: [{}],
+        movieGenres: [],
+        tvGenres: [],
         ImageUrl: 'https://image.tmdb.org/t/p/w500',
-        selectedOption: 'all',
+        selectedItem: 'all',
+        selectedMovieGenre: 'all',
+        selectedTVGenre: 'all',
         isLoaded: false,
         filmReference: require('../assets/script/filmReference.js')
       }
@@ -123,37 +133,89 @@
           console.log(error);
         })
       },
+      getAllGenreList(string){
+      axios.get(`${this.apiUrlBase}/genre${string}/list`, {
+        params: {
+          api_key: this.apiParams.api_key,
+          language: this.apiParams.language
+        }
+      })
+      .then(response =>{
+        if(string === '/movie'){
+          this.movieGenres = response.data.genres;
+          console.log('generi film', this.movieGenres);
+        }else{
+          this.tvGenres = response.data.genres;
+          console.log('generi tv', this.tvGenres);
+        }
+      })
+      .catch(error =>{
+        console.log(error);
+      })
+    },
       queryString(string){
         this.apiParams.query = string;
         this.isLoaded = false
         if(this.apiParams.query === ''){
           this.getTrending('/movie');
           this.getTrending('/tv');
+          this.selectedMovieGenre = 'all';
+          this.selectedTVGenre = 'all';
         } else{
           this.getApi('/movie')
           this.getApi('/tv')
         }  
       },
-      optionSelector(string){
-        this.selectedOption = string
+      itemSelector(string){
+        this.selectedItem = string
+      },
+      movieGenreSelector(string){
+        this.selectedMovieGenre = string
+      },
+      tvGenreSelector(string){
+        this.selectedTVGenre = string
       },
       referenceSelector(min, max){
         return  this.filmReference.default[Math.floor(Math.random() * (max - min + 1) + min)]
+      }
+    },
+    computed:{
+      movieWithGenre(){
+        let movieCompatiblesGenres = this.films;
+
+        if(this.selectedMovieGenre !== 'all'){
+          let selectedGenre = this.movieGenres.filter(genre => genre.name === this.selectedMovieGenre);
+          console.log('genere selezionato', selectedGenre[0].id);
+          movieCompatiblesGenres = this.films.filter(film => film.genre_ids.includes(selectedGenre[0].id));
+          console.log('film con genere selezionato', movieCompatiblesGenres);
+        }
+        return movieCompatiblesGenres
+      },
+      tvWithGenre(){
+        let tvCompatiblesGenres = this.tvSeries;
+
+        if(this.selectedTVGenre !== 'all'){
+          let selectedGenre = this.tvGenres.filter(genre => genre.name === this.selectedTVGenre);
+          console.log('genere selezionato', selectedGenre[0].id);
+          tvCompatiblesGenres = this.tvSeries.filter(serie => serie.genre_ids.includes(selectedGenre[0].id));
+          console.log('serieTv con genere selezionato', tvCompatiblesGenres);
+        }
+        return tvCompatiblesGenres
       }
     },
 
     mounted(){
       this.getTrending('/movie');
       this.getTrending('/tv');
+      this.getAllGenreList('/movie');
+      this.getAllGenreList('/tv');
       console.log('array delle reference', this.filmReference);
-      
     }
   }
 </script>
 
 <style lang="scss" scoped>
   @import '../assets/style/variables.scss';
-  @import '../assets/style/mixin.scss';
 
   main{
     background-color: $primary-color;
