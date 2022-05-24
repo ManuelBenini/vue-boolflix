@@ -68,25 +68,8 @@
         <p v-else>Lingua: {{queryElement.original_language}}</p>
         <p>Voto: {{queryElement.vote_average / 2}}</p>
 
-        <div class="stars">
-          <div class="star star-1" v-if="queryElement.vote_average / 2 > 1" ><font-awesome-icon icon="fa-solid fa-star" /></div>
-          <div class="star star-1" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
-          <div class="star star-2" v-if="queryElement.vote_average / 2 >= 1.5 && queryElement.vote_average / 2 < 2"><font-awesome-icon icon="fa-solid fa-star-half-stroke" /></div>
-
-          <div class="star star-2" v-if="queryElement.vote_average / 2 > 2" ><font-awesome-icon icon="fa-solid fa-star" /></div>
-          <div class="star star-2" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
-          <div class="star star-3" v-if="queryElement.vote_average / 2 >= 2.5 && queryElement.vote_average / 2 < 3" ><font-awesome-icon icon="fa-solid fa-star-half-stroke" /></div>
-
-          <div class="star star-3" v-if="queryElement.vote_average / 2 > 3" ><font-awesome-icon icon="fa-solid fa-star" /></div>
-          <div class="star star-3" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
-          <div class="star star-4" v-if="queryElement.vote_average / 2 >= 3.5 && queryElement.vote_average / 2 < 4" ><font-awesome-icon icon="fa-solid fa-star-half-stroke" /></div>
-
-          <div class="star star-4" v-if="queryElement.vote_average / 2 > 4" ><font-awesome-icon icon="fa-solid fa-star" /></div>
-          <div class="star star-4" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
-          <div class="star star-5" v-if="queryElement.vote_average / 2 >= 4.5 && queryElement.vote_average / 2 < 5" ><font-awesome-icon icon="fa-solid fa-star-half-stroke" /></div>
-          
-          <div class="star star-5" v-if="queryElement.vote_average / 2 === 5" ><font-awesome-icon icon="fa-solid fa-star" /></div>
-          <div class="star star-5" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
+        <div class="stars" v-if="queryElement.vote_average !== 0">
+          <div v-html="starsGeneration(queryElement.vote_average / 2)"></div>
         </div>
 
         <div class="cast">
