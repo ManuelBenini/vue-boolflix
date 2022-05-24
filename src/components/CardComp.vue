@@ -19,28 +19,13 @@
           :squared="false" />
         </p>
         <p v-else>Lingua: {{queryElement.original_language}}</p>
-        <p>Voto: {{queryElement.vote_average / 2}}</p>
+        <p v-if="queryElement.vote_average !== 0">Voto: {{queryElement.vote_average / 2}}</p>
 
-        <div class="stars">
-          <div class="star star-1" v-if="queryElement.vote_average / 2 > 1" ><font-awesome-icon icon="fa-solid fa-star" /></div>
-          <div class="star star-1" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
-          <div class="star star-2" v-if="queryElement.vote_average / 2 >= 1.5 && queryElement.vote_average / 2 < 2"><font-awesome-icon icon="fa-solid fa-star-half-stroke" /></div>
-
-          <div class="star star-2" v-if="queryElement.vote_average / 2 > 2" ><font-awesome-icon icon="fa-solid fa-star" /></div>
-          <div class="star star-2" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
-          <div class="star star-3" v-if="queryElement.vote_average / 2 >= 2.5 && queryElement.vote_average / 2 < 3" ><font-awesome-icon icon="fa-solid fa-star-half-stroke" /></div>
-
-          <div class="star star-3" v-if="queryElement.vote_average / 2 > 3" ><font-awesome-icon icon="fa-solid fa-star" /></div>
-          <div class="star star-3" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
-          <div class="star star-4" v-if="queryElement.vote_average / 2 >= 3.5 && queryElement.vote_average / 2 < 4" ><font-awesome-icon icon="fa-solid fa-star-half-stroke" /></div>
-
-          <div class="star star-4" v-if="queryElement.vote_average / 2 > 4" ><font-awesome-icon icon="fa-solid fa-star" /></div>
-          <div class="star star-4" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
-          <div class="star star-5" v-if="queryElement.vote_average / 2 >= 4.5 && queryElement.vote_average / 2 < 5" ><font-awesome-icon icon="fa-solid fa-star-half-stroke" /></div>
-          
-          <div class="star star-5" v-if="queryElement.vote_average / 2 === 5" ><font-awesome-icon icon="fa-solid fa-star" /></div>
-          <div class="star star-5" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
+        <div class="stars" v-if="queryElement.vote_average !== 0">
+          <div v-html="starsGeneration(queryElement.vote_average / 2)"></div>
         </div>
+
+        <p v-else>Voto non disponbile</p>
 
         <div class="cast">
           <button class="castBtn" @click="getActorsApi('/movie', queryElement.id)">cast</button>
@@ -185,6 +170,35 @@ export default {
       .catch(error =>{
         console.log(error);
       })
+    },
+    starsGeneration(vote){
+      let star = '';
+      let i = 0;
+      let decimalVote = 0;
+      while(i < Math.round(vote)){
+        decimalVote = parseInt(vote.toString().charAt(2));
+        star += `<i class='bi bi-star-fill'></i>`;
+        i++;
+        if(decimalVote >= 5 && i === Math.round(vote - 1)){
+          star += `<i class='bi bi-star-half'></i>`
+          i++
+        }
+      }
+
+      let a = 0;
+      let emptyStar = 0;
+
+      if(decimalVote >= 5){
+        emptyStar = 5 - Math.ceil(vote) // oppure parseInt(vote + 1);
+      }else{
+        emptyStar = 5 - Math.floor(vote) //oppure parseInt(vote);
+      }
+      while(a < emptyStar){
+        star += `<i class='bi bi-star'></i>`;
+        a++;
+      }
+
+      return star
     }
   }
 }
@@ -248,26 +262,7 @@ export default {
       margin-top: 30px;
     }
     .stars{
-      position: relative;
       height: 20px;
-      .star{
-        position: absolute;
-      }
-      .star-1{
-        left: 0px;
-      }
-      .star-2{
-        left: 20px;
-      }
-      .star-3{
-        left: 40px;
-      }
-      .star-4{
-        left: 60px;
-      }
-      .star-5{
-        left: 80px;
-      }
     }
     .cast{
       margin-top: 10px;
