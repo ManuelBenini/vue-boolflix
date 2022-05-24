@@ -13,7 +13,7 @@
 
         <p v-if="queryElement.original_title != queryElement.title">titolo originale: {{queryElement.original_title}}</p>
         <p 
-          v-if="queryElement.original_language != 'sv' && queryElement.original_language != 'sk' && queryElement.original_language != 'nl'" 
+          v-if="langFlag.default.includes(queryElement.original_language)" 
           class="flag">
           <lang-flag :iso="queryElement.original_language" 
           :squared="false" />
@@ -75,7 +75,7 @@
         <h2>{{queryElement.name}}</h2>
         <p v-if="queryElement.original_name != queryElement.name">titolo originale: {{queryElement.original_name}}</p>
         <p 
-          v-if="queryElement.original_language != 'sv' && queryElement.original_language != 'sk' && queryElement.original_language != 'nl'" 
+          v-if="langFlag.default.includes(queryElement.original_language)" 
           class="flag">
           <lang-flag :iso="queryElement.original_language" 
           :squared="false" />
@@ -152,7 +152,8 @@ export default {
   data(){
     return{
       firstFiveActors: [],
-      elementGenres: []
+      elementGenres: [],
+      langFlag: require('../assets/script/langFlag.js')
     }
   },
   methods:{
