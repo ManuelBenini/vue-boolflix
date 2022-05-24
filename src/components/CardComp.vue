@@ -8,10 +8,16 @@
         <img v-else src="https://yify-subs.net/images/default_thumbnail.svg" alt="immagine placeholder">
       </div>
 
-      <div class="flip-card-back" v-if="typeOfSearch === 'film'">
-        <h2>{{queryElement.title}}</h2>
+      <div class="flip-card-back" v-if="typeOfSearch === 'film' || typeOfSearch === 'serieTV'">
+        <h2>{{queryElement.title || queryElement.name}}</h2>
 
-        <p v-if="queryElement.original_title != queryElement.title">titolo originale: {{queryElement.original_title}}</p>
+        <p 
+          v-if="queryElement.original_title != queryElement.title || 
+          queryElement.original_name != queryElement.name"
+        >
+          titolo originale: {{queryElement.original_title || queryElement.original_name}}
+        </p>
+
         <p 
           v-if="langFlag.default.includes(queryElement.original_language)" 
           class="flag">
@@ -42,51 +48,6 @@
 
         <div class="genres">
           <button class="genreBtn" @click="getGenreList('/movie', queryElement.genre_ids)">generi</button>
-          <div class="genre-container">
-            <div class="genre" v-for="genre in elementGenres" :key="genre.id">
-              <p>-{{genre.name}}</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="description">
-          <p v-if="queryElement.overview != ''">{{queryElement.overview}}</p>
-          <p v-else>Nessuna descrizione.</p>
-        </div>
-      </div>
-
-
-      <div class="flip-card-back" v-if="typeOfSearch === 'serieTV'">
-        <h2>{{queryElement.name}}</h2>
-        <p v-if="queryElement.original_name != queryElement.name">titolo originale: {{queryElement.original_name}}</p>
-        <p 
-          v-if="langFlag.default.includes(queryElement.original_language)" 
-          class="flag">
-          <lang-flag :iso="queryElement.original_language" 
-          :squared="false" />
-        </p>
-        <p v-else>Lingua: {{queryElement.original_language}}</p>
-        <p>Voto: {{queryElement.vote_average / 2}}</p>
-
-        <div class="stars" v-if="queryElement.vote_average !== 0">
-          <div v-html="starsGeneration(queryElement.vote_average / 2)"></div>
-        </div>
-
-        <div class="cast">
-          <button class="castBtn" @click="getActorsApi('/tv', queryElement.id)">cast</button>
-          <div class="actors">
-            <div class="actor" v-for="actor in firstFiveActors" :key="actor.id">
-              <h6>{{actor.name}}</h6>
-              <div class="propic">
-                <img v-if="actor.profile_path != null" :src="`${elementImageUrl}${actor.profile_path}`" alt="foto attore">
-                <img v-else src="https://d3uscstcbhvk7k.cloudfront.net/static/images/slider-placeholder-2x.png" alt="immagine placeholder">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="genres">
-          <button class="genreBtn" @click="getGenreList('/tv', queryElement.genre_ids)">generi</button>
           <div class="genre-container">
             <div class="genre" v-for="genre in elementGenres" :key="genre.id">
               <p>-{{genre.name}}</p>
