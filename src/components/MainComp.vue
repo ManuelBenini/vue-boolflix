@@ -14,6 +14,9 @@
           :queryElement="film"
           :elementImageUrl="ImageUrl"
           typeOfSearch="film"
+          :apiUrlBase="apiUrlBase"
+          :api_key="apiParams.api_key"
+          :language="apiParams.language"
         />
       </div>
 
@@ -30,6 +33,9 @@
           :queryElement="serie"
           :elementImageUrl="ImageUrl"
           typeOfSearch="serieTV"
+          :apiUrlBase="apiUrlBase"
+          :api_key="apiParams.api_key"
+          :language="apiParams.language"
         />
       </div>
 
@@ -61,7 +67,8 @@
     components: { MainTop, CardComp, QueryTitleComp },
     data(){
       return{
-        apiUrl: 'https://api.themoviedb.org/3/search',
+        apiUrlBase: 'https://api.themoviedb.org/3',
+        apiUrlSearch: 'https://api.themoviedb.org/3/search',
         trendingUrl: 'https://api.themoviedb.org/3',
         apiParams:{
           api_key: '1f779dcaa67f2a9b43bc653638990b2f',
@@ -70,6 +77,7 @@
         },
         films: [],
         tvSeries: [],
+        actors: [{}],
         ImageUrl: 'https://image.tmdb.org/t/p/w500',
         selectedOption: 'all',
         isLoaded: false,
@@ -78,9 +86,8 @@
     },
     methods:{
       getApi(string){
-        axios.get(this.apiUrl + string, {params: this.apiParams})
+        axios.get(this.apiUrlSearch + string, {params: this.apiParams})
         .then(response =>{
-          console.log(response.data);
           if(string === '/movie'){
             this.films = response.data.results;
             console.log('film ricercati', this.films);
@@ -102,7 +109,6 @@
           }
         })
         .then(response =>{
-          console.log(response.data);
           if(string === '/movie'){
             this.films = response.data.results;
             console.log('film popolari', this.films);
@@ -139,7 +145,8 @@
     mounted(){
       this.getTrending('/movie');
       this.getTrending('/tv');
-      console.log(this.filmReference);
+      console.log('array delle reference', this.filmReference);
+      
     }
   }
 </script>
@@ -174,10 +181,8 @@
       margin-top: 50px;
     }
 
-
-
-
-        .lds-heart {
+    // loading
+    .lds-heart {
       display: inline-block;
       position: relative;
       width: 80px;

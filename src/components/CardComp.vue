@@ -10,6 +10,7 @@
 
       <div class="flip-card-back" v-if="typeOfSearch === 'film'">
         <h2>{{queryElement.title}}</h2>
+
         <p v-if="queryElement.original_title != queryElement.title">titolo originale: {{queryElement.original_title}}</p>
         <p 
           v-if="queryElement.original_language != 'sv' && queryElement.original_language != 'sk' && queryElement.original_language != 'nl'" 
@@ -19,6 +20,7 @@
         </p>
         <p v-else>Lingua: {{queryElement.original_language}}</p>
         <p>Voto: {{queryElement.vote_average / 2}}</p>
+
         <div class="stars">
           <div class="star star-1" v-if="queryElement.vote_average / 2 > 1" ><font-awesome-icon icon="fa-solid fa-star" /></div>
           <div class="star star-1" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
@@ -39,11 +41,35 @@
           <div class="star star-5" v-if="queryElement.vote_average / 2 === 5" ><font-awesome-icon icon="fa-solid fa-star" /></div>
           <div class="star star-5" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
         </div>
+
+        <div class="cast">
+          <button class="castBtn" @click="getActorsApi('/movie', queryElement.id)">cast</button>
+          <div class="actors">
+            <div class="actor" v-for="actor in firstFiveActors" :key="actor.id">
+              <h6>{{actor.name}}</h6>
+              <div class="propic">
+                <img v-if="actor.profile_path != null" :src="`${elementImageUrl}${actor.profile_path}`" alt="foto attore">
+                <img v-else src="https://d3uscstcbhvk7k.cloudfront.net/static/images/slider-placeholder-2x.png" alt="immagine placeholder">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="genres">
+          <button class="genreBtn" @click="getGenreList('/movie', queryElement.genre_ids)">generi</button>
+          <div class="genre-container">
+            <div class="genre" v-for="genre in elementGenres" :key="genre.id">
+              <p>-{{genre.name}}</p>
+            </div>
+          </div>
+        </div>
+
         <div class="description">
           <p v-if="queryElement.overview != ''">{{queryElement.overview}}</p>
           <p v-else>Nessuna descrizione.</p>
         </div>
       </div>
+
 
       <div class="flip-card-back" v-if="typeOfSearch === 'serieTV'">
         <h2>{{queryElement.name}}</h2>
@@ -56,6 +82,7 @@
         </p>
         <p v-else>Lingua: {{queryElement.original_language}}</p>
         <p>Voto: {{queryElement.vote_average / 2}}</p>
+
         <div class="stars">
           <div class="star star-1" v-if="queryElement.vote_average / 2 > 1" ><font-awesome-icon icon="fa-solid fa-star" /></div>
           <div class="star star-1" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
@@ -76,6 +103,29 @@
           <div class="star star-5" v-if="queryElement.vote_average / 2 === 5" ><font-awesome-icon icon="fa-solid fa-star" /></div>
           <div class="star star-5" v-else><font-awesome-icon icon="fa-regular fa-star" /></div>
         </div>
+
+        <div class="cast">
+          <button class="castBtn" @click="getActorsApi('/tv', queryElement.id)">cast</button>
+          <div class="actors">
+            <div class="actor" v-for="actor in firstFiveActors" :key="actor.id">
+              <h6>{{actor.name}}</h6>
+              <div class="propic">
+                <img v-if="actor.profile_path != null" :src="`${elementImageUrl}${actor.profile_path}`" alt="foto attore">
+                <img v-else src="https://d3uscstcbhvk7k.cloudfront.net/static/images/slider-placeholder-2x.png" alt="immagine placeholder">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="genres">
+          <button class="genreBtn" @click="getGenreList('/tv', queryElement.genre_ids)">generi</button>
+          <div class="genre-container">
+            <div class="genre" v-for="genre in elementGenres" :key="genre.id">
+              <p>-{{genre.name}}</p>
+            </div>
+          </div>
+        </div>
+
         <div class="description">
           <p v-if="queryElement.overview != ''">{{queryElement.overview}}</p>
           <p v-else>Nessuna descrizione.</p>
@@ -87,12 +137,54 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'CardComp',
   props:{
     queryElement: Object,
     elementImageUrl: String,
-    typeOfSearch: String
+    typeOfSearch: String,
+    apiUrlBase: String,
+    api_key: String,
+    language: String
+  },
+  data(){
+    return{
+      firstFiveActors: [],
+      elementGenres: []
+    }
+  },
+  methods:{
+    getActorsApi(string, id){
+      axios.get(`${this.apiUrlBase}${string}/${id}/credits`, {
+        params: {
+          api_key: this.api_key
+        }
+      })
+      .then(response =>{
+        this.firstFiveActors = response.data.cast.filter(actor => actor.order < 5);
+        console.log('primi 5 attori', this.firstFiveActors);
+      })
+      .catch(error =>{
+        console.log(error);
+      })
+    },
+    getGenreList(string, elementId){
+      axios.get(`${this.apiUrlBase}/genre${string}/list`, {
+        params: {
+          api_key: this.api_key,
+          language: this.language
+        }
+      })
+      .then(response =>{
+        this.elementGenres = response.data.genres.filter(genre => elementId.includes(genre.id))
+        console.log('generi', this.elementGenres);
+      })
+      .catch(error =>{
+        console.log(error);
+      })
+    }
   }
 }
 </script>
@@ -174,6 +266,68 @@ export default {
       }
       .star-5{
         left: 80px;
+      }
+    }
+    .cast{
+      margin-top: 10px;
+      position: relative;
+      &:hover .actors{
+        display: flex;
+        z-index: 30;
+      }
+      button{
+        background-color: rgba($color: #000000, $alpha: 0.5);
+        color: white;
+        width: 100%;
+        font-weight: bold;
+      }
+      .actors{
+        display: none;
+        position: absolute;
+        top: 20px;
+        left: 0;
+        border: 1px solid white;
+        background-color: rgba($color: #000000, $alpha: 0.8);
+        .actor{
+          width: calc(100% / 5 - 5px);
+          margin-right: 5px;
+          h6{
+            min-height: 50px;
+          }
+          .propic{
+            height: 150px;
+            img{
+              width: 100%;
+              height: 100%;
+            }
+          }
+        }
+      }
+    }
+    .genres{
+      position: relative;
+      &:hover .genre-container{
+        display: flex;
+      }
+      button{
+        background-color: rgba($color: #000000, $alpha: 0.5);
+        color: white;
+        width: 100%;
+        font-weight: bold;
+      }
+      .genre-container{
+        display: none;
+        position: absolute;
+        top: 20px;
+        left: 0;
+        border: 1px solid white;
+        background-color: rgba($color: #000000, $alpha: 0.8);
+        flex-wrap: wrap;
+        & *{
+          margin-right: 15px;
+          flex-shrink: 0;
+          width: calc(100% / 4);
+        }
       }
     }
     .description{
