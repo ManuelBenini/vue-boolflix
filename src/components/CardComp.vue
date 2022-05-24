@@ -25,6 +25,10 @@
           :squared="false" />
         </p>
         <p v-else>Lingua: {{queryElement.original_language}}</p>
+
+        <p v-if="queryElement.release_date !== '' && queryElement.first_air_date !== '' ">{{queryElement.release_date || queryElement.first_air_date}}</p>
+        <p v-else>Data di rilascio non disponibile</p>
+
         <p v-if="queryElement.vote_average !== 0">Voto: {{queryElement.vote_average / 2}}</p>
 
         <div class="stars" v-if="queryElement.vote_average !== 0">
