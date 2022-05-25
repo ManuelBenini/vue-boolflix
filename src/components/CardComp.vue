@@ -125,10 +125,10 @@ export default {
       let decimalVote = 0;
       while(i < Math.round(vote)){
         decimalVote = parseInt(vote.toString().charAt(2));
-        star += `<i class='bi bi-star-fill'></i>`;
+        star += `<i class="fa-solid fa-star"></i>`;
         i++;
         if(decimalVote >= 5 && i === Math.round(vote - 1)){
-          star += `<i class='bi bi-star-half'></i>`
+          star += `<i class="fa-regular fa-star-half-stroke"></i>`
           i++
         }
       }
@@ -142,7 +142,7 @@ export default {
         emptyStar = 5 - Math.floor(vote) //oppure parseInt(vote);
       }
       while(a < emptyStar){
-        star += `<i class='bi bi-star'></i>`;
+        star += `<i class="fa-regular fa-star"></i>`;
         a++;
       }
 
