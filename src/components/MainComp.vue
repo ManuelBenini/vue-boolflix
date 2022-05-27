@@ -16,14 +16,16 @@
 
         <div class="film-cards" v-if="films.length > 0 && (selectedItem === 'all' || selectedItem === 'film')" >
           <CardComp 
-            v-for="film in movieWithGenre" 
+            v-for="(film, index) in movieWithGenre" 
             :key="film.id" 
+            :index="index"
             :queryElement="film"
             :elementImageUrl="ImageUrl"
             typeOfSearch="film"
             :apiUrlBase="apiUrlBase"
             :api_key="apiParams.api_key"
             :language="apiParams.language"
+            @elementoSelezionato="selectedElement"
           />
         </div>
 
@@ -35,14 +37,16 @@
 
         <div class="tvSeries-cards" v-if="tvSeries.length > 0 && (selectedItem === 'all' || selectedItem === 'serieTV')">
           <CardComp 
-            v-for="serie in tvWithGenre" 
+            v-for="(serie,index) in tvWithGenre" 
             :key="serie.id" 
             :queryElement="serie"
+            :index="index"
             :elementImageUrl="ImageUrl"
             typeOfSearch="serieTV"
             :apiUrlBase="apiUrlBase"
             :api_key="apiParams.api_key"
             :language="apiParams.language"
+            @elementoSelezionato="selectedElement"
           />
         </div>
 
@@ -51,6 +55,8 @@
         </div>
 
       </div>
+
+      <WatchLaterComp />
     </div>
 
     <div v-else class="loading">
@@ -72,10 +78,11 @@
   import CardComp from './CardComp.vue';
   import axios from 'axios';
   import QueryTitleComp from './QueryTitleComp.vue';
+  import WatchLaterComp from './WatchLaterComp.vue';
 
   export default {
     name: "MainComp",
-    components: { MainTop, CardComp, QueryTitleComp },
+    components: { MainTop, CardComp, QueryTitleComp, WatchLaterComp },
     data(){
       return{
         apiUrlBase: 'https://api.themoviedb.org/3',
@@ -95,7 +102,9 @@
         selectedMovieGenre: 'all',
         selectedTVGenre: 'all',
         isLoaded: false,
-        filmReference: require('../assets/script/filmReference.js')
+        filmReference: require('../assets/script/filmReference.js'),
+        selectedElementIndex: -1,
+        isClicked: false
       }
     },
     methods:{
@@ -181,7 +190,11 @@
       },
       referenceSelector(min, max){
         return  this.filmReference.default[Math.floor(Math.random() * (max - min + 1) + min)]
-      }
+      },
+      selectedElement(index){
+        this.selectedElementIndex = index;
+        this.isClicked = !this.isClicked
+      },
     },
     computed:{
       movieWithGenre(){
@@ -206,6 +219,26 @@
         }
         return tvCompatiblesGenres
       }
+    },
+    watch:{
+      isClicked(){
+        axios.get('http://localhost:3000/user1')
+        .then(r => {
+          if(r.data.length === 0){
+            console.log('aggiungo nell arr vuoto', this.films[this.selectedElementIndex].id)
+            axios.post('http://localhost:3000/user1', this.films[this.selectedElementIndex]) 
+          }else{
+            if(r.data.filter(obj => obj.id === this.films[this.selectedElementIndex].id).length === 0){
+              axios.post('http://localhost:3000/user1', this.films[this.selectedElementIndex])
+              console.log('push dentro condizione');
+            }else{
+              axios.delete(`http://localhost:3000/user1/${this.films[this.selectedElementIndex].id}`)
+              console.log('cancellazione elemento già presente');
+            }
+          }
+        })
+      
+        }
     },
 
     mounted(){

@@ -3,7 +3,7 @@
 
     <div class="flip-card-inner">
 
-      <div class="flip-card-front" >
+      <div class="flip-card-front">
         <img v-if="queryElement.poster_path != null" :src="`${elementImageUrl}${queryElement.poster_path}`" alt="immagine queryElement">
         <img v-else src="https://yify-subs.net/images/default_thumbnail.svg" alt="immagine placeholder">
       </div>
@@ -29,10 +29,21 @@
         <p v-if="queryElement.release_date !== '' && queryElement.first_air_date !== '' ">{{queryElement.release_date || queryElement.first_air_date}}</p>
         <p v-else>Data di rilascio non disponibile</p>
 
-        <p v-if="queryElement.vote_average !== 0">Voto: {{queryElement.vote_average / 2}}</p>
+        <p v-if="queryElement.vote_average !== 0">Voto: {{queryElement.vote_average}}</p>
 
-        <div class="stars" v-if="queryElement.vote_average !== 0">
-          <div v-html="starsGeneration(queryElement.vote_average / 2)"></div>
+        <div class="stars-and-toWatch" v-if="queryElement.vote_average !== 0">
+          <div class="stars">
+            <i v-for="a in Math.floor(Math.round(queryElement.vote_average)/2)" :key='`a${a}`' class="fa-solid fa-star"></i>
+            <i v-if="Math.round(queryElement.vote_average) % 2" class="fa-regular fa-star-half-stroke"></i>
+            <i v-for="b in (5 - Math.floor(Math.round(queryElement.vote_average)/2) - (Math.round(queryElement.vote_average) % 2))" :key='`b${b}`' class="fa-regular fa-star"></i>
+          </div>
+
+          <div class="toWatch">
+            <button 
+              :class="{'elementAdded' : toWatchAdded}"
+              @click="toWatchAdded = !toWatchAdded , $emit('elementoSelezionato', index)" 
+               >Watch list</button>
+          </div>
         </div>
 
         <p v-else>Voto non disponbile</p>
@@ -80,13 +91,15 @@ export default {
     typeOfSearch: String,
     apiUrlBase: String,
     api_key: String,
-    language: String
+    language: String,
+    index: Number
   },
   data(){
     return{
       firstFiveActors: [],
       elementGenres: [],
-      langFlag: require('../assets/script/langFlag.js')
+      langFlag: require('../assets/script/langFlag.js'),
+      toWatchAdded: false,
     }
   },
   methods:{
@@ -119,35 +132,6 @@ export default {
         console.log(error);
       })
     },
-    starsGeneration(vote){
-      let star = '';
-      let i = 0;
-      let decimalVote = 0;
-      while(i < Math.round(vote)){
-        decimalVote = parseInt(vote.toString().charAt(2));
-        star += `<i class="fa-solid fa-star"></i>`;
-        i++;
-        if(decimalVote >= 5 && i === Math.round(vote - 1)){
-          star += `<i class="fa-regular fa-star-half-stroke"></i>`
-          i++
-        }
-      }
-
-      let a = 0;
-      let emptyStar = 0;
-
-      if(decimalVote >= 5){
-        emptyStar = 5 - Math.ceil(vote) // oppure parseInt(vote + 1);
-      }else{
-        emptyStar = 5 - Math.floor(vote) //oppure parseInt(vote);
-      }
-      while(a < emptyStar){
-        star += `<i class="fa-regular fa-star"></i>`;
-        a++;
-      }
-
-      return star
-    }
   }
 }
 </script>
@@ -209,8 +193,27 @@ export default {
     .flag{
       margin-top: 30px;
     }
-    .stars{
+    .stars-and-toWatch{
+      position: relative;
       height: 20px;
+      display: flex;
+      justify-content: space-between;
+      button{
+        border: none;
+        background-color: rgba($color: #000000, $alpha: 0.8);
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+        color: white;
+        position: absolute;
+        right: 0;
+        top: -20px;
+        cursor: pointer;
+      }
+      .elementAdded{
+        background-color: yellow;
+        color: black;
+      }
     }
     .cast{
       margin-top: 10px;
